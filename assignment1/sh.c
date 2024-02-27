@@ -48,6 +48,10 @@ runcmd(struct cmd *cmd)
   struct pipecmd *pcmd;
   struct redircmd *rcmd;
 
+  // all linux command in /bin/*
+  char *root="/bin/";
+  char *search_path=(char *)malloc(100 * sizeof(char));
+
   if(cmd == 0)
     exit(0);
   
@@ -58,10 +62,19 @@ runcmd(struct cmd *cmd)
 
   case ' ':
     ecmd = (struct execcmd*)cmd;
-    if(ecmd->argv[0] == 0)
+    if(ecmd->argv[0] == 0) // null 
       exit(0);
-    fprintf(stderr, "exec not implemented\n");
-    // Your code here ...
+   
+    // use int execv(const char *path, char *const argv[]); run command under /bin/*
+
+    strcpy(search_path, root);                  
+    strcat(search_path, ecmd->argv[0]);         
+    if (execv(search_path, ecmd->argv) == -1) {
+        perror("execv");
+        exit(EXIT_FAILURE);
+    }
+    printf("\n");
+
     break;
 
   case '>':
